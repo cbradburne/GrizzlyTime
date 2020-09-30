@@ -31,17 +31,15 @@ import java.util.logging.Level;
 
 public class GrizzlyScene {
     /**
-     * @author Dalton Smith
-     * GrizzlyScene
-     * Manages the main interface
+     * @author Dalton Smith GrizzlyScene Manages the main interface
      */
 
-    //object that should be able to be modified by calling
-    //this scene directly
+    // object that should be able to be modified by calling
+    // this scene directly
     private static Label messageText = new Label("");
     private static TextField studentIDBox = new TextField();
 
-    //define our scene objects
+    // define our scene objects
     private Button loginButton = new Button("Login/Logout");
     private UserActivity userActivity = new UserActivity();
     private Text description = new Text(Constants.kUserTutorial);
@@ -56,17 +54,17 @@ public class GrizzlyScene {
 
     private String sIDBox = "";
 
-    //boolean state variables
+    // boolean state variables
     private boolean handsFreeMode = LocalDbActivity.kHandsFreeMode;
 
-    //our upper image
+    // our upper image
     private ImageView imageView;
 
     public GrizzlyScene() {
         Image splash;
         File file = new File(CommonUtils.getCurrentDir() + File.separator + "images" + File.separator + "error.png");
 
-        //check for custom splash
+        // check for custom splash
         if (file.exists()) {
             splash = new Image(file.toURI().toString());
 
@@ -79,12 +77,12 @@ public class GrizzlyScene {
 
     public void updateInterface(GridPane root) {
 
-        //create the upper image
+        // create the upper image
         imageView.setFitHeight(Constants.kCameraHeight);
         GridPane.setHalignment(imageView, HPos.CENTER);
         root.add(imageView, 0, 0);
 
-        //update CSS IDS
+        // update CSS IDS
         messageText.setId("messageText");
         studentIDBox.setId("textBox");
         loginButton.setId("confirmButton");
@@ -92,13 +90,13 @@ public class GrizzlyScene {
         optionsLink.setId("hyperlinkBottom");
         creditsText.setId("hyperlinkBottom");
 
-        //create our panes
+        // create our panes
         GridPane options = new GridPane();
         GridPane title = new GridPane();
 
         subRoot.setId("bottomView");
 
-        //confirm alignments
+        // confirm alignments
         subRoot.setAlignment(Pos.CENTER);
         options.setAlignment(Pos.CENTER);
         title.setAlignment(Pos.CENTER);
@@ -106,19 +104,19 @@ public class GrizzlyScene {
         description.setTextAlignment(TextAlignment.CENTER);
         description.setId("textDescription");
 
-        //manually align message text because Gridpane is weird
+        // manually align message text because Gridpane is weird
         GridPane.setHalignment(messageText, HPos.CENTER);
         GridPane.setHalignment(description, HPos.CENTER);
         GridPane.setHalignment(subRoot, HPos.CENTER);
 
-        //set bottom pane details
+        // set bottom pane details
         bottomPane.setId("bottomPane");
         bottomPane.setLeft(optionsLink);
         bottomPane.setCenter(creditsText);
         bottomPane.setRight(creditsLink);
         bottomPane.setMinWidth(subRoot.getWidth());
 
-        //add our various nodes to respective panes
+        // add our various nodes to respective panes
         title.add(description, 0, 1);
         options.add(studentIDBox, 0, 0);
         options.add(loginButton, 1, 0);
@@ -126,14 +124,14 @@ public class GrizzlyScene {
         subRoot.add(options, 0, 1);
         subRoot.add(messageText, 0, 2);
 
-        //sub root details
+        // sub root details
         subRoot.setVgap(10);
 
-        //add to root pane
+        // add to root pane
         root.add(subRoot, 0, 1);
         root.add(bottomPane, 0, 2);
 
-        //handle our buttons
+        // handle our buttons
         setEventHandlers();
 
     }
@@ -141,24 +139,24 @@ public class GrizzlyScene {
     public void reShowUI(GridPane root) {
         root.setId("main");
 
-        //add to root pane
+        // add to root pane
         root.add(imageView, 0, 0);
         root.add(subRoot, 0, 1);
         root.add(bottomPane, 0, 2);
     }
 
-    //our event handlers for interactivity
+    // our event handlers for interactivity
     private void setEventHandlers() {
-        //login on enter key press
+        // login on enter key press
         studentIDBox.setOnAction(event -> confirmLogin());
 
-        //login button event handler
+        // login button event handler
         loginButton.setOnAction(event -> confirmLogin());
 
         creditsLink.setOnAction(event -> showCredits());
 
         optionsLink.setOnAction(event -> {
-            Stage stage = (Stage)optionsLink.getScene().getWindow();
+            Stage stage = (Stage) optionsLink.getScene().getWindow();
             if (KeyActivity.isFullscreen) {
                 stage.setFullScreen(false);
                 KeyActivity.isFullscreen = false;
@@ -173,17 +171,16 @@ public class GrizzlyScene {
         SceneManager.updateScene(Constants.kCreditsSceneState);
     }
 
-    //helper login method
+    // helper login method
     private void confirmLogin() {
         setMessageBoxText("Processing...");
-        GrizzlyScene.disableInput();
         sIDBox = studentIDBox.getText();
+        GrizzlyScene.disableInput();
 
-        //confirm the ID is vslid
+        // confirm the ID is vslid
         if (!userActivity.isValidID(sIDBox)) {
             setMessageBoxText("ID " + sIDBox + " is invalid.");
             GrizzlyScene.clearInput();
-
             Task<Void> wait = new Task<Void>() {
                 @Override
                 protected Void call() throws Exception {
@@ -193,62 +190,57 @@ public class GrizzlyScene {
             };
 
             wait.setOnSucceeded(e -> setMessageBoxText(""));
-
-            //no need to set as daemon as will end after x seconds.
-            new Thread(wait).start();
             GrizzlyScene.enableInput();
-            return;
 
+            // no need to set as daemon as will end after x seconds.
+            new Thread(wait).start();
+            return;
         }
 
         if (!handsFreeMode) {
-            //confirm that the user wants to login/logout
+            // confirm that the user wants to login/logout
             if (alertUtils.confirmInput("Confirm login/logout of user: " + sIDBox)) {
                 loginUser();
             } else {
                 setMessageBoxText("");
             }
 
-        //show no prompts
+            // show no prompts
         } else {
+            // GrizzlyScene.disableInput();
             loginUser();
         }
-
     }
 
-    //login the user, check if hands free or not
+    // login the user, check if hands free or not
     private void loginUser() {
-        //separate login process on different thread to ensure
-        //main application does not freeze
-        //also allows in for multiple users login simultaneously
-        //Runnable loginUser = () -> {
-            //ensure that the user typed something in
+        // separate login process on different thread to ensure
+        // main application does not freeze
+        // also allows in for multiple users login simultaneously
+        Runnable loginUser = () -> {
+            // ensure that the user typed something in
             if (sIDBox.isEmpty()) {
                 setMessageBoxText("Nothing was entered!");
                 return;
-
             }
 
-            //attempt login/logout and or account creation
-            //do nothing if account creation was cancelled
+            // attempt login/logout and or account creation
+            // do nothing if account creation was cancelled
             try {
-                //check if the user is logged in, and that user exists
+                // check if the user is logged in, and that user exists
                 if (!(userActivity.isUserLoggedIn(sIDBox))) {
                     LoggingUtils.log(Level.INFO, "Logging in: " + sIDBox);
                     userActivity.loginUser(sIDBox);
-
                 } else {
                     LoggingUtils.log(Level.INFO, "Logging out: " + sIDBox);
                     userActivity.logoutUser(sIDBox);
-
                 }
 
             } catch (CancelledUserCreationException e) {
-                //setMessageBoxText("User not found");
-                
+                setMessageBoxText("User not found");
                 GrizzlyScene.clearInput();
                 GrizzlyScene.enableInput();
-                setMessageBoxText("");
+                //setMessageBoxText("");
 
             } catch (ConnectToWorksheetException e) {
                 setMessageBoxText("There was an error connecting to the database. Please retry.");
@@ -267,17 +259,32 @@ public class GrizzlyScene {
                 GrizzlyScene.enableInput();
             }
 
-            //refocus the textbox
+            // refocus the textbox
             Platform.runLater(() -> studentIDBox.requestFocus());
-        //};
 
-        //start our thread
-        //Thread t = new Thread(loginUser);
-        //t.setDaemon(true);
-        //t.start();
+            // clear messageboxtext after 3 seconds
+            Task<Void> task2 = new Task<Void>() {
+
+                @Override
+                protected Void call() throws InterruptedException {
+                    //setMessageBoxText("User not found");
+                    Thread.sleep(3000);
+                    setMessageBoxText("");
+                    return null;
+                }
+            };
+            // run task on different thread
+            new Thread(task2).start();
+
+        };
+
+        // start our thread
+        Thread t = new Thread(loginUser);
+        t.setDaemon(true);
+        t.start();
     }
 
-    //helper methods for setting and clearing text box
+    // helper methods for setting and clearing text box
     public static void setMessageBoxText(String text) {
         if (Platform.isFxApplicationThread()) {
             messageText.setText(text);
@@ -286,12 +293,15 @@ public class GrizzlyScene {
         }
     }
 
-    public static void clearInput() { studentIDBox.clear(); }
+    public static void clearInput() {
+        studentIDBox.clear();
+    }
 
     public static void enableInput() {
         studentIDBox.setEditable(true);
         studentIDBox.setDisable(false);
     }
+
     public static void disableInput() {
         studentIDBox.setEditable(false);
         studentIDBox.setDisable(true);

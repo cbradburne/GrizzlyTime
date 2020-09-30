@@ -40,8 +40,6 @@ public class UserActivity {
 
         switch (state) {
             case Constants.kIdDoesNotExist:
-            //Platform.runLater(() -> 
-            //GrizzlyScene.setMessageBoxText("User not found");
                 break;
             case Constants.kIdLoggedIn:
                 return true;
@@ -53,23 +51,21 @@ public class UserActivity {
         }
 
         // ID not in database
-
         LoggingUtils.log(Level.INFO, "User not found");
-        
-
-        Task<Void> task = new Task<Void>() {
+        /*
+        Task<Void> task2 = new Task<Void>() {
 
             @Override
             protected Void call() throws InterruptedException {
                 GrizzlyScene.setMessageBoxText("User not found");
-                Thread.sleep(3000);
-                GrizzlyScene.setMessageBoxText("");
+                Thread.sleep(7000);
+                //GrizzlyScene.setMessageBoxText("");
                 return null;
             }
         };
         // run task on different thread
-        new Thread(task).start();
-
+        new Thread(task2).start();
+*/
         throw new CancelledUserCreationException("Cancelled");
 
     }
