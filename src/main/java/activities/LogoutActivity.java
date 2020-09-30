@@ -97,6 +97,7 @@ public class LogoutActivity {
         Platform.runLater(() -> {
             GrizzlyScene.setMessageBoxText("Logged out user: " + userID);
             GrizzlyScene.clearInput();
+            GrizzlyScene.enableInput();
         });
 
     }

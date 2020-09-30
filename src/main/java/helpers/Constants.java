@@ -93,18 +93,17 @@ public class Constants {
 
 
     /*
-        Task<Void> wait = new Task<Void>() {
-                @Override
-                protected Void call() throws Exception {
-                    Thread.sleep(5000);
-                    return null;
-                }
-            };
+        Task<Void> task = new Task<Void>() {
 
-            wait.setOnSucceeded(e -> setMessageBoxText(""));
-
-            //no need to set as daemon as will end after x seconds.
-            new Thread(wait).start();
-            return;
+            @Override
+            protected Void call() throws InterruptedException {
+                GrizzlyScene.setMessageBoxText("User not found");
+                Thread.sleep(3000);
+                GrizzlyScene.setMessageBoxText("");
+                return null;
+            }
+        };
+        // run task on different thread
+        new Thread(task).start();
     */
 }

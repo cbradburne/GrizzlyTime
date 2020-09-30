@@ -9,6 +9,7 @@ import helpers.LoggingUtils;
 import javafx.application.Platform;
 import scenes.GrizzlyScene;
 
+import javafx.concurrent.Task;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
@@ -17,9 +18,8 @@ import java.util.logging.Level;
 
 public class UserActivity {
     /**
-     * @author Dalton Smith
-     * UserActivity class
-     * Contains the various methods for handling user login/logout
+     * @author Dalton Smith UserActivity class Contains the various methods for
+     *         handling user login/logout
      */
 
     private DatabaseUtils dbUtils = new DatabaseUtils();
@@ -30,7 +30,7 @@ public class UserActivity {
 
     private static DateTimeFormatter formatter = DateTimeFormatter.ISO_DATE_TIME;
 
-    //check if user is logged in
+    // check if user is logged in
     public boolean isUserLoggedIn(String userID) throws Exception {
         dbUtils.getUpdatedData();
 
@@ -40,6 +40,8 @@ public class UserActivity {
 
         switch (state) {
             case Constants.kIdDoesNotExist:
+            //Platform.runLater(() -> 
+            //GrizzlyScene.setMessageBoxText("User not found");
                 break;
             case Constants.kIdLoggedIn:
                 return true;
@@ -50,21 +52,32 @@ public class UserActivity {
                 break;
         }
 
-        //request users first name and last name
-        LoggingUtils.log(Level.INFO, "New User Detected");
-        ArrayList<String> userData = alertUtils.getUserInfo();
+        // ID not in database
 
-        //throws CancelledUserException if registration was cancelled
-        createNewUser(userData, userID);
+        LoggingUtils.log(Level.INFO, "User not found");
+        
 
-        return false;
+        Task<Void> task = new Task<Void>() {
+
+            @Override
+            protected Void call() throws InterruptedException {
+                GrizzlyScene.setMessageBoxText("User not found");
+                Thread.sleep(3000);
+                GrizzlyScene.setMessageBoxText("");
+                return null;
+            }
+        };
+        // run task on different thread
+        new Thread(task).start();
+
+        throw new CancelledUserCreationException("Cancelled");
 
     }
 
     public void createNewUser(ArrayList<String> userData, String userID) throws CancelledUserCreationException {
-        //cancel if user cancelled or exited registration dialog
+        // cancel if user cancelled or exited registration dialog
         if (("TRUE").equalsIgnoreCase(userData.get(0))) {
-            //create user then login
+            // create user then login
             ArrayList<BatchUpdateData> data = new ArrayList<>();
 
             int blankRow = dbUtils.nextEmptyCellColumn(Constants.kMainSheet);
@@ -91,7 +104,7 @@ public class UserActivity {
             dbUtils.setCellDataBatch(data, Constants.kLogSheet);
             dbUtils.getUpdatedData();
 
-            //ensure there is a date column
+            // ensure there is a date column
             logoutActivity.getCurrentDateColumn();
 
         } else {
@@ -108,9 +121,9 @@ public class UserActivity {
     }
 
     public int doesIdExist(ArrayList<String> ids, String userID) {
-        //check if the user ID exists
+        // check if the user ID exists
         for (int i = 0; i < ids.size(); i++) {
-            //if the user exists, check if logged in or logged out and return state
+            // if the user exists, check if logged in or logged out and return state
             if (ids.get(i).equals(userID)) {
                 String cellData = dbUtils.getCellData(i, Constants.kLoggedInColumn, Constants.kMainSheet);
                 try {
@@ -118,7 +131,7 @@ public class UserActivity {
 
                 } catch (NullPointerException e) {
                     continue;
-                    //do nothing because the cell doesn't exist?
+                    // do nothing because the cell doesn't exist?
                 }
 
                 if (cellData.equals("TRUE")) {
@@ -134,45 +147,47 @@ public class UserActivity {
         return Constants.kIdDoesNotExist;
     }
 
-    //login our user
+    // login our user
     public void loginUser(String userID) {
         Platform.runLater(() -> GrizzlyScene.setMessageBoxText("Logging in user: " + userID));
 
-        //grab the current time from system and format it into string
+        // grab the current time from system and format it into string
         LocalDateTime loginTime = LocalDateTime.now();
         String formattedLoginTime = loginTime.format(formatter);
 
         int userRow = dbUtils.getCellRowFromColumn(userID, Constants.kStudentIdColumn, Constants.kMainSheet);
 
-        //log the user in
+        // log the user in
         if (userRow != -1) {
             loginActivity.loginUser(userRow, formattedLoginTime);
 
             Platform.runLater(() -> {
                 GrizzlyScene.setMessageBoxText("Successfully logged in user: " + userID);
                 GrizzlyScene.clearInput();
+                GrizzlyScene.enableInput();
             });
 
         }
 
     }
 
-    //logout the user
+    // logout the user
     public void logoutUser(String userID) {
         Platform.runLater(() -> GrizzlyScene.setMessageBoxText("Logging out user: " + userID));
 
-        //grab the row the user is on
+        // grab the row the user is on
         int userRow = dbUtils.getCellRowFromColumn(userID, Constants.kStudentIdColumn, Constants.kMainSheet);
 
-        //grab last logged in time
+        // grab last logged in time
         LocalDateTime logoutTime = LocalDateTime.now();
-        LocalDateTime loginTime = LocalDateTime.parse(dbUtils.getCellData(userRow, Constants.kLastLoginColumn, Constants.kMainSheet), formatter);
+        LocalDateTime loginTime = LocalDateTime
+                .parse(dbUtils.getCellData(userRow, Constants.kLastLoginColumn, Constants.kMainSheet), formatter);
 
         String formattedLogoutTime = logoutTime.format(formatter);
 
-        //assuming userRow isn't invalid, calculate difference in time and log hours
+        // assuming userRow isn't invalid, calculate difference in time and log hours
         if (userRow != -1) {
-            //update the logout time
+            // update the logout time
             dbUtils.setCellData(userRow, Constants.kLastLogoutColumn, formattedLogoutTime, Constants.kMainSheet);
 
             int diffHours = logoutTime.getHour() - loginTime.getHour();
@@ -182,7 +197,8 @@ public class UserActivity {
             boolean err = false;
 
             if (diffHours < 0) {
-                LoggingUtils.log(Level.SEVERE, "Well this is awkward, difference shouldn't be negative: h:" + diffHours + " m:"+ diffMinutes + " s:"+diffSeconds);
+                LoggingUtils.log(Level.SEVERE, "Well this is awkward, difference shouldn't be negative: h:" + diffHours
+                        + " m:" + diffMinutes + " s:" + diffSeconds);
                 err = true;
             }
 
@@ -195,8 +211,6 @@ public class UserActivity {
                 diffHours -= 1;
                 diffMinutes = 60 - Math.abs(diffMinutes);
             }
-
-
 
             if (loginTime.getYear() == logoutTime.getYear()) {
                 if (loginTime.getMonth() == logoutTime.getMonth()) {
@@ -211,28 +225,28 @@ public class UserActivity {
             }
 
             if (!err) {
-				String totalTimeFromDifference = String.format("%02d:%02d:%02d", diffHours, diffMinutes, diffSeconds);
-				LocalTime totalHoursTime = LocalTime.parse(totalTimeFromDifference);
-				
+                String totalTimeFromDifference = String.format("%02d:%02d:%02d", diffHours, diffMinutes, diffSeconds);
+                LocalTime totalHoursTime = LocalTime.parse(totalTimeFromDifference);
+
                 logoutActivity.logoutUserWithHours(userID, userRow, totalHoursTime, totalTimeFromDifference);
             }
 
-            //logout the user
+            // logout the user
             dbUtils.setCellData(userRow, Constants.kLoggedInColumn, "FALSE", Constants.kMainSheet);
 
-            if(err) {
+            if (err) {
                 Platform.runLater(() -> {
                     GrizzlyScene.setMessageBoxText("You forgot to log out! Please re-login!");
                     GrizzlyScene.clearInput();
+                    GrizzlyScene.enableInput();
                 });
             }
-
 
         }
 
     }
 
-    //checks if ID is valid long and x digit number (x based on config file)
+    // checks if ID is valid long and x digit number (x based on config file)
     public boolean isValidID(String userID) {
         int idLength = LocalDbActivity.kIdLength;
         int mentorIdLength = LocalDbActivity.kIdLengthFallback;
@@ -249,7 +263,7 @@ public class UserActivity {
             }
 
         } catch (NumberFormatException e) {
-            //not a valid ID
+            // not a valid ID
             return false;
         }
     }

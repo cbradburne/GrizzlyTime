@@ -176,13 +176,14 @@ public class GrizzlyScene {
     //helper login method
     private void confirmLogin() {
         setMessageBoxText("Processing...");
+        GrizzlyScene.disableInput();
         sIDBox = studentIDBox.getText();
 
         //confirm the ID is vslid
         if (!userActivity.isValidID(sIDBox)) {
             setMessageBoxText("ID " + sIDBox + " is invalid.");
             GrizzlyScene.clearInput();
-            
+
             Task<Void> wait = new Task<Void>() {
                 @Override
                 protected Void call() throws Exception {
@@ -195,6 +196,7 @@ public class GrizzlyScene {
 
             //no need to set as daemon as will end after x seconds.
             new Thread(wait).start();
+            GrizzlyScene.enableInput();
             return;
 
         }
@@ -219,7 +221,7 @@ public class GrizzlyScene {
         //separate login process on different thread to ensure
         //main application does not freeze
         //also allows in for multiple users login simultaneously
-        Runnable loginUser = () -> {
+        //Runnable loginUser = () -> {
             //ensure that the user typed something in
             if (sIDBox.isEmpty()) {
                 setMessageBoxText("Nothing was entered!");
@@ -242,27 +244,37 @@ public class GrizzlyScene {
                 }
 
             } catch (CancelledUserCreationException e) {
-                setMessageBoxText("Cancelled account creation");
+                //setMessageBoxText("User not found");
+                
+                GrizzlyScene.clearInput();
+                GrizzlyScene.enableInput();
+                setMessageBoxText("");
 
             } catch (ConnectToWorksheetException e) {
                 setMessageBoxText("There was an error connecting to the database. Please retry.");
+                GrizzlyScene.clearInput();
+                GrizzlyScene.enableInput();
 
             } catch (NoRouteToHostException e) {
                 setMessageBoxText("Unable to connect to database. Check internet and retry.");
+                GrizzlyScene.clearInput();
+                GrizzlyScene.enableInput();
 
             } catch (Exception e) {
                 LoggingUtils.log(Level.SEVERE, e);
                 setMessageBoxText("An unknown error has occurred, see log file.");
+                GrizzlyScene.clearInput();
+                GrizzlyScene.enableInput();
             }
 
             //refocus the textbox
             Platform.runLater(() -> studentIDBox.requestFocus());
-        };
+        //};
 
         //start our thread
-        Thread t = new Thread(loginUser);
-        t.setDaemon(true);
-        t.start();
+        //Thread t = new Thread(loginUser);
+        //t.setDaemon(true);
+        //t.start();
     }
 
     //helper methods for setting and clearing text box
@@ -275,5 +287,14 @@ public class GrizzlyScene {
     }
 
     public static void clearInput() { studentIDBox.clear(); }
+
+    public static void enableInput() {
+        studentIDBox.setEditable(true);
+        studentIDBox.setDisable(false);
+    }
+    public static void disableInput() {
+        studentIDBox.setEditable(false);
+        studentIDBox.setDisable(true);
+    }
 
 }
