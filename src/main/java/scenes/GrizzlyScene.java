@@ -54,6 +54,8 @@ public class GrizzlyScene {
 
     private GridPane subRoot = new GridPane();
 
+    private String sIDBox = "";
+
     //boolean state variables
     private boolean handsFreeMode = LocalDbActivity.kHandsFreeMode;
 
@@ -174,11 +176,13 @@ public class GrizzlyScene {
     //helper login method
     private void confirmLogin() {
         setMessageBoxText("Processing...");
+        sIDBox = studentIDBox.getText();
 
         //confirm the ID is vslid
-        if (!userActivity.isValidID(studentIDBox.getText())) {
-            setMessageBoxText("ID " + studentIDBox.getText() + " is invalid.");
-
+        if (!userActivity.isValidID(sIDBox)) {
+            setMessageBoxText("ID " + sIDBox + " is invalid.");
+            GrizzlyScene.clearInput();
+            
             Task<Void> wait = new Task<Void>() {
                 @Override
                 protected Void call() throws Exception {
@@ -197,7 +201,7 @@ public class GrizzlyScene {
 
         if (!handsFreeMode) {
             //confirm that the user wants to login/logout
-            if (alertUtils.confirmInput("Confirm login/logout of user: " + studentIDBox.getText())) {
+            if (alertUtils.confirmInput("Confirm login/logout of user: " + sIDBox)) {
                 loginUser();
             } else {
                 setMessageBoxText("");
@@ -217,7 +221,7 @@ public class GrizzlyScene {
         //also allows in for multiple users login simultaneously
         Runnable loginUser = () -> {
             //ensure that the user typed something in
-            if (studentIDBox.getText().isEmpty()) {
+            if (sIDBox.isEmpty()) {
                 setMessageBoxText("Nothing was entered!");
                 return;
 
@@ -227,13 +231,13 @@ public class GrizzlyScene {
             //do nothing if account creation was cancelled
             try {
                 //check if the user is logged in, and that user exists
-                if (!(userActivity.isUserLoggedIn(studentIDBox.getText()))) {
-                    LoggingUtils.log(Level.INFO, "Logging in: " + studentIDBox.getText());
-                    userActivity.loginUser(studentIDBox.getText());
+                if (!(userActivity.isUserLoggedIn(sIDBox))) {
+                    LoggingUtils.log(Level.INFO, "Logging in: " + sIDBox);
+                    userActivity.loginUser(sIDBox);
 
                 } else {
-                    LoggingUtils.log(Level.INFO, "Logging out: " + studentIDBox.getText());
-                    userActivity.logoutUser(studentIDBox.getText());
+                    LoggingUtils.log(Level.INFO, "Logging out: " + sIDBox);
+                    userActivity.logoutUser(sIDBox);
 
                 }
 

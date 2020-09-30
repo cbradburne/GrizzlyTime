@@ -21,7 +21,7 @@ public class Constants {
     public static final int kCameraHeight = 400;
 
     //window constants
-    public static final boolean kWindowResizable = false;
+    public static final boolean kWindowResizable = true;
 
     //sheet codes
     public static final int kMainSheet = 0;
@@ -89,4 +89,22 @@ public class Constants {
     public static final int kCreditsSceneState = 2;
     public static final int kOptionsSceneState = 3;
     public static final int kLoadMainScene = 4;
+
+
+
+    /*
+        Task<Void> wait = new Task<Void>() {
+                @Override
+                protected Void call() throws Exception {
+                    Thread.sleep(5000);
+                    return null;
+                }
+            };
+
+            wait.setOnSucceeded(e -> setMessageBoxText(""));
+
+            //no need to set as daemon as will end after x seconds.
+            new Thread(wait).start();
+            return;
+    */
 }
