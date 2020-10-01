@@ -13,17 +13,21 @@ import javafx.stage.Stage;
 import notifiers.UpdateNotifier;
 import scenes.SceneManager;
 
+import javafx.concurrent.Task;
+import javafx.concurrent.WorkerStateEvent;
+import javafx.event.EventHandler;
+
 import java.io.File;
 import java.util.logging.Level;
 
 public class GrizzlyTime extends Application {
     /**
-     * @author Dalton Smith
-     * GrizzlyTime main application class
-     * This class calls our various activities and starts the JavaFX application
+     * @author Dalton Smith GrizzlyTime main application class This class calls our
+     *         various activities and starts the JavaFX application
      */
 
-    //only initializations that don't have freezing constructor instances should be placed here
+    // only initializations that don't have freezing constructor instances should be
+    // placed here
     private KeyActivity keyHandlers = new KeyActivity();
     private UpdateNotifier updater = new UpdateNotifier();
 
@@ -31,16 +35,17 @@ public class GrizzlyTime extends Application {
 
     @Override
     public void start(Stage primaryStage) {
-        //set application in commonutils to access hostservices
+        // set application in commonutils to access hostservices
         CommonUtils.application = this;
 
         Thread.setDefaultUncaughtExceptionHandler((thread, throwable) -> globalExceptionHandler(throwable));
 
         dbActivity.updateLocalDb();
 
-        //check if custom icon
+        // check if custom icon
         File file = new File(CommonUtils.getCurrentDir() + File.separator + "images" + File.separator + "icon.png");
-        File stylesheet = new File(CommonUtils.getCurrentDir() + File.separator + "styles" + File.separator + "style.css");
+        File stylesheet = new File(
+                CommonUtils.getCurrentDir() + File.separator + "styles" + File.separator + "style.css");
         if (file.exists()) {
             primaryStage.getIcons().add(new Image(file.toURI().toString()));
 
@@ -74,38 +79,52 @@ public class GrizzlyTime extends Application {
             primaryStage.setTitle(applicationName);
         }
 
+        AlertUtils.stage = primaryStage;
+
         primaryStage.setScene(scene);
         primaryStage.setResizable(Constants.kWindowResizable);
 
-        //show our splash
+        // show our splash
         SceneManager.updateScene(Constants.kSplashSceneState);
         primaryStage.show();
         primaryStage.requestFocus();
 
-        //initialize our activities and interface objects AFTER
-        //we display application
-        SceneManager.updateScene(Constants.kLoadMainScene);
-
-        AlertUtils.stage = primaryStage;
-
-        //remove splash screen on load
-        root.getChildren().clear();
-        primaryStage.setWidth(Constants.kMainStageWidth);
-        primaryStage.setHeight(Constants.kMainStageHeight);
         primaryStage.centerOnScreen();
 
-        //add our global key handlers
+        // add our global key handlers
         keyHandlers.setKeyHandlers(scene, primaryStage);
 
-        //check for updates
-        updater.checkUpdates();
+        // check for updates
+        // updater.checkUpdates();
 
-        //create UI and logic
-        SceneManager.updateScene(Constants.kMainSceneState);
+        // delay for splash screen
+        Task<Void> sleeper = new Task<Void>() {
+            @Override
+            protected Void call() throws Exception {
+                try {
+                    Thread.sleep(3000);
+                } catch (InterruptedException e) {
+                }
+                return null;
+            }
+        };
+        sleeper.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
+            @Override
+            public void handle(WorkerStateEvent event) {
+
+                // create UI and logic
+                SceneManager.updateScene(Constants.kLoadMainScene);
+                primaryStage.setWidth(Constants.kMainStageWidth);
+                primaryStage.setHeight(Constants.kMainStageHeight);
+                SceneManager.updateScene(Constants.kMainSceneState);
+                primaryStage.centerOnScreen();
+            }
+        });
+        new Thread(sleeper).start();
 
     }
 
-    //catch uncaught exceptions
+    // catch uncaught exceptions
     private static void globalExceptionHandler(Throwable throwable) {
         LoggingUtils.log(Level.SEVERE, throwable);
         CommonUtils.exitApplication();

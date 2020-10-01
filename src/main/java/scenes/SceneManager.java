@@ -61,6 +61,7 @@ public class SceneManager {
                 LoggingUtils.log(Level.WARNING, scene + " is unknown");
                 break;
         }
+
     }
 
     private static void loadSplash() {
