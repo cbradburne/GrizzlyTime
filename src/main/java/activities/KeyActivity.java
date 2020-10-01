@@ -15,6 +15,7 @@ public class KeyActivity {
 
     public void setKeyHandlers(Scene scene, Stage stage) {
         //make application fullscreen on f key press
+        /*
         scene.setOnKeyPressed(event -> {
             if (event.getCode() == KeyCode.F11) {
                 if (isFullscreen) {
@@ -28,6 +29,7 @@ public class KeyActivity {
                 }
             }
         });
+        */
 
     }
 }

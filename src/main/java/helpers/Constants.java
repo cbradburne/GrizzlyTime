@@ -91,7 +91,9 @@ public class Constants {
     public static final int kLoadMainScene = 4;
 
 
+    // Notes
 
+    // Delay
     /*
         Task<Void> task = new Task<Void>() {
 
@@ -106,4 +108,8 @@ public class Constants {
         // run task on different thread
         new Thread(task).start();
     */
+
+    // MacOS permissions for gradlew
+    // chmod +x gradlew
+
 }
