@@ -10,7 +10,7 @@ import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
-import notifiers.UpdateNotifier;
+//import notifiers.UpdateNotifier;
 import scenes.SceneManager;
 
 import javafx.concurrent.Task;
@@ -28,7 +28,7 @@ public class GrizzlyTime extends Application {
 
     //only initializations that don't have freezing constructor instances should be placed here
     private KeyActivity keyHandlers = new KeyActivity();
-    private UpdateNotifier updater = new UpdateNotifier();
+    //private UpdateNotifier updater = new UpdateNotifier();
 
     private LocalDbActivity dbActivity = new LocalDbActivity();
 
@@ -113,7 +113,7 @@ public class GrizzlyTime extends Application {
                 primaryStage.setResizable(true);
 
                 //check for updates
-                updater.checkUpdates();
+                //updater.checkUpdates();
 
                 SceneManager.updateScene(Constants.kLoadMainScene);
                 primaryStage.setWidth(Constants.kMainStageWidth);

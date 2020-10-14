@@ -18,7 +18,8 @@ public class Constants {
     public static final int kEmailColumn = 3;
 
     //camera feed size
-    public static final int kCameraHeight = 400;
+    //public static final int kCameraHeight = 400;
+    public static final int kCameraHeight = 300;
 
     //window constants
     public static final boolean kWindowResizable = false;
@@ -47,9 +48,9 @@ public class Constants {
     //main ui constants
     //public static final String kUserTutorial = "Type in your Student ID to login. If you do not have a Student ID," +
     //        "\nenter any " + LocalDbActivity.kIdLengthFallback + " digit ID code.";
-    public static final String kUserTutorial = "Please press your fob to the reader.";
-    public static final int kMainStageWidth = 608;
-    public static final int kMainStageHeight = 630;
+    public static final String kUserTutorial = "Please hold your fob to the reader.";
+    public static final int kMainStageWidth = 800;
+    public static final int kMainStageHeight = 480;
     public static final String kApplicationName = "GrizzlyTime JavaFX Edition";
 
     //credits ui constants
