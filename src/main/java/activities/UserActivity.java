@@ -233,7 +233,7 @@ public class UserActivity {
         int mentorIdLength = LocalDbActivity.kIdLengthFallback;
 
         try {
-            Long.parseLong(userID);
+            //Long.parseLong(userID);
 
             if (Constants.kMentorFallback) {
                 return userID.length() == idLength || userID.length() == mentorIdLength;

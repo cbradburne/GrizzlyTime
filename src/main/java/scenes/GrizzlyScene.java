@@ -253,7 +253,7 @@ public class GrizzlyScene {
     private void confirmLogin() {
         setMessageBoxText("Processing...");
 
-        //confirm the ID is vslid
+        //confirm the ID is valid
         if (!userActivity.isValidID(studentIDBox.getText())) {
             setMessageBoxText("ID " + studentIDBox.getText() + " is invalid.");
 
