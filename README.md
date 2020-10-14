@@ -18,7 +18,7 @@ I'm currently working on a workaround or an alternative means of storing this da
 - Individual logging of days signed in
 - Tracking of student/mentor total hours
 - Easy 1 minute registration for new users
-- Compatible with USB Barcode Scanners
+- Compatible with USB Barcode Scanners and USB RFID tag readers
 - Graphics and Application name are customizable without code
 - Easily extendable
 
@@ -27,12 +27,7 @@ I'm currently working on a workaround or an alternative means of storing this da
 - Gather statistics of student growth over time
 
 ## Downloads
-Currently supported OSes: Windows, Linux
-Unsupported OSes: Mac
-Note: I would love to support Mac. Unfortunately, I do not own a Mac machine to test GrizzlyTime on. It may
-or may not work.
-
-Download the latest **release** [here](https://github.com/YCSRobotics/GrizzlyTime/releases/latest "here").
+Currently supported OSes using Changes branch: Windows 10, MacOS 10.15.7, Raspbian (RaspberryPi)
 
 A setup tutorial can be found [here.](https://www.youtube.com/watch?v=GhDeMjEh9ao "here.")  
 Or see the [wiki](https://github.com/YCSRobotics/GrizzlyTime/wiki "wiki")
